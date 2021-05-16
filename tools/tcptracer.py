@@ -17,6 +17,7 @@
 from __future__ import print_function
 from bcc import BPF
 from bcc.containers import filter_by_containers
+from bcc.utils import printb
 
 import argparse as ap
 from socket import inet_ntop, AF_INET, AF_INET6
@@ -524,9 +525,9 @@ def print_ipv4_event(cpu, data, size):
         if start_ts == 0:
             start_ts = event.ts_ns
         if args.verbose:
-            print("%-14d" % (event.ts_ns - start_ts), end="")
+            printb("%-14d" % (event.ts_ns - start_ts), nl="")
         else:
-            print("%-9.3f" % ((event.ts_ns - start_ts) / 1000000000.0), end="")
+            printb("%-9.3f" % ((event.ts_ns - start_ts) / 1000000000.0), nl="")
     if event.type == 1:
         type_str = "C"
     elif event.type == 2:
@@ -537,21 +538,21 @@ def print_ipv4_event(cpu, data, size):
         type_str = "U"
 
     if args.verbose:
-        print("%-12s " % (verbose_types[type_str]), end="")
+        printb("%-12s " % (verbose_types[type_str]), nl="")
     else:
-        print("%-2s " % (type_str), end="")
+        printb("%-2s " % (type_str), nl="")
 
-    print("%-6d %-16s %-2d %-16s %-16s %-6d %-6d" %
+    printb("%-6d %-16s %-2d %-16s %-16s %-6d %-6d" %
           (event.pid, event.comm.decode('utf-8', 'replace'),
            event.ip,
            inet_ntop(AF_INET, pack("I", event.saddr)),
            inet_ntop(AF_INET, pack("I", event.daddr)),
            event.sport,
-           event.dport), end="")
+           event.dport), nl="")
     if args.verbose and not args.netns:
-        print(" %-8d" % event.netns)
+        printb(" %-8d" % event.netns)
     else:
-        print()
+        printb("")
 
 
 def print_ipv6_event(cpu, data, size):
@@ -561,9 +562,9 @@ def print_ipv6_event(cpu, data, size):
         if start_ts == 0:
             start_ts = event.ts_ns
         if args.verbose:
-            print("%-14d" % (event.ts_ns - start_ts), end="")
+            printb("%-14d" % (event.ts_ns - start_ts), nl="")
         else:
-            print("%-9.3f" % ((event.ts_ns - start_ts) / 1000000000.0), end="")
+            printb("%-9.3f" % ((event.ts_ns - start_ts) / 1000000000.0), nl="")
     if event.type == 1:
         type_str = "C"
     elif event.type == 2:
@@ -574,21 +575,21 @@ def print_ipv6_event(cpu, data, size):
         type_str = "U"
 
     if args.verbose:
-        print("%-12s " % (verbose_types[type_str]), end="")
+        printb("%-12s " % (verbose_types[type_str]), nl="")
     else:
-        print("%-2s " % (type_str), end="")
+        printb("%-2s " % (type_str), nl="")
 
-    print("%-6d %-16s %-2d %-16s %-16s %-6d %-6d" %
+    printb("%-6d %-16s %-2d %-16s %-16s %-6d %-6d" %
           (event.pid, event.comm.decode('utf-8', 'replace'),
            event.ip,
            "[" + inet_ntop(AF_INET6, event.saddr) + "]",
            "[" + inet_ntop(AF_INET6, event.daddr) + "]",
            event.sport,
-           event.dport), end="")
+           event.dport), nl="")
     if args.verbose and not args.netns:
-        print(" %-8d" % event.netns)
+        printb(" %-8d" % event.netns)
     else:
-        print()
+        printb("")
 
 
 pid_filter = ""
@@ -622,16 +623,16 @@ print("Tracing TCP established connections. Ctrl-C to end.")
 # header
 if args.verbose:
     if args.timestamp:
-        print("%-14s" % ("TIME(ns)"), end="")
-    print("%-12s %-6s %-16s %-2s %-16s %-16s %-6s %-7s" % ("TYPE",
-          "PID", "COMM", "IP", "SADDR", "DADDR", "SPORT", "DPORT"), end="")
+        printb("%-14s" % ("TIME(ns)"), nl="")
+    printb("%-12s %-6s %-16s %-2s %-16s %-16s %-6s %-7s" % ("TYPE",
+          "PID", "COMM", "IP", "SADDR", "DADDR", "SPORT", "DPORT"), nl="")
     if not args.netns:
-        print("%-8s" % "NETNS", end="")
-    print()
+        printb("%-8s" % "NETNS", nl="")
+    printb("")
 else:
     if args.timestamp:
-        print("%-9s" % ("TIME(s)"), end="")
-    print("%-2s %-6s %-16s %-2s %-16s %-16s %-6s %-6s" %
+        printb("%-9s" % ("TIME(s)"), nl="")
+    printb("%-2s %-6s %-16s %-2s %-16s %-16s %-6s %-6s" %
           ("T", "PID", "COMM", "IP", "SADDR", "DADDR", "SPORT", "DPORT"))
 
 start_ts = 0
